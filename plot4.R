@@ -1,0 +1,26 @@
+#loading data
+
+data_exam <- read.table("household_power_consumption.txt", header = TRUE, sep = ";", na.strings = "?") 
+date_time <- paste(data_exam$Date,data_exam$Time)
+date_time <- strptime(date_time,"%d/%m/%Y %H:%M:%S")
+data_examf <- cbind(date_time,data_exam)
+data_examf$Date <-as.Date(data_examf$Date, format = "%d/%m/%Y")
+
+
+#Subseting data
+minidata1 <- subset(data_examf, data_examf$Date >= "2007-02-01")
+minidataf <- subset(minidata1, minidata1$Date <= "2007-02-02")
+c <- range(c(minidataf$Sub_metering_1,minidataf$Sub_metering_2,minidataf$Sub_metering_3))
+f <- c("Sub_metering_1","Sub_metering_2","Sub_metering_3")
+png("plot4.png",width = 480, height = 480, units = "px")
+par(mfrow=c(2,2))
+plot(minidataf$date_time, minidataf$Global_active_power, type = "l", ylab = "Global Active Power (kilowatts)", xlab="")
+plot(minidataf$date_time, minidataf$Voltage, type = "l", ylab = "Voltage", xlab="datetime")
+with(minidataf, plot(date_time, Sub_metering_1, type = "l", xlab = "", ylab = "Energy sub metering", ylim = c))
+par(new = TRUE)
+with(minidataf, plot(date_time, Sub_metering_2, type = "l", col = "red", axes = FALSE, xlab = "", ylab = "", ylim = c))  
+par(new = TRUE)
+with(minidataf, plot(date_time, Sub_metering_3, type = "l", col = "blue", axes = FALSE, xlab = "", ylab = "", ylim = c)) 
+legend("topright", f , lty = 1, col = c("black","red","blue"))
+plot(minidataf$date_time, minidataf$Global_reactive_power, type = "l", ylab = "Global_reactive_power", xlab="datetime")
+dev.off()
